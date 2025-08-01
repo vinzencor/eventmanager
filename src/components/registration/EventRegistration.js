@@ -144,18 +144,35 @@ const EventRegistration = () => {
         eventImage: event.imageUrl
       };
 
+      console.log('📧 About to call sendTicketEmail...');
+      console.log('📧 sendTicketEmail function type:', typeof sendTicketEmail);
       console.log('📧 Calling sendTicketEmail with data:', ticketData);
-      const emailResult = await sendTicketEmail(ticketData);
-      console.log('📧 Email result:', emailResult);
 
-      if (emailResult.success) {
+      let emailResult;
+      try {
+        emailResult = await sendTicketEmail(ticketData);
+        console.log('📧 Email result received:', emailResult);
+      } catch (emailError) {
+        console.error('❌ Exception in sendTicketEmail call:', emailError);
+        emailResult = {
+          success: false,
+          error: emailError?.message || emailError?.toString() || 'Email function call failed'
+        };
+      }
+
+      if (emailResult && emailResult.success) {
         console.log('✅ Ticket email sent successfully');
         // Update registration to mark email as sent
-        await updateDoc(registrationDoc, { ticketSent: true });
+        try {
+          await updateDoc(registrationDoc, { ticketSent: true });
+        } catch (updateError) {
+          console.warn('⚠️ Failed to update ticketSent status:', updateError);
+        }
       } else {
-        console.error('❌ Email sending failed:', emailResult.error);
+        const errorMessage = emailResult?.error || 'Unknown email error';
+        console.error('❌ Email sending failed:', errorMessage);
         // Show user-friendly error message
-        alert(`Registration successful, but email failed to send: ${emailResult.error}. Please contact support with your ticket number: ${ticketNumber}`);
+        alert(`Registration successful, but email failed to send: ${errorMessage}. Please contact support with your ticket number: ${ticketNumber}`);
       }
 
       console.log('🎉 Registration completed successfully!');

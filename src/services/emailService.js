@@ -1,5 +1,12 @@
 import emailjs from '@emailjs/browser';
 
+console.log('📧 EmailJS imported:', typeof emailjs);
+console.log('📧 Environment variables:', {
+  serviceId: process.env.REACT_APP_EMAILJS_SERVICE_ID,
+  templateId: process.env.REACT_APP_EMAILJS_TEMPLATE_ID,
+  publicKey: process.env.REACT_APP_EMAILJS_PUBLIC_KEY ? 'SET' : 'NOT_SET'
+});
+
 // EmailJS Configuration
 // You'll need to set up EmailJS account and get these values
 const EMAIL_CONFIG = {
@@ -7,6 +14,8 @@ const EMAIL_CONFIG = {
   templateId: process.env.REACT_APP_EMAILJS_TEMPLATE_ID || 'template_default',
   publicKey: process.env.REACT_APP_EMAILJS_PUBLIC_KEY || 'your_public_key'
 };
+
+console.log('📧 EMAIL_CONFIG created:', EMAIL_CONFIG);
 
 // Initialize EmailJS
 console.log('🔧 Initializing EmailJS with config:', {
@@ -52,54 +61,85 @@ export const generateTicketNumber = () => {
   return `TKT-${timestamp}-${random}`.toUpperCase();
 };
 
-// Generate verification QR code data
+// Generate verification QR code data (optimized for size)
 export const generateVerificationQRData = (ticketNumber, eventId, userEmail) => {
   const verificationData = {
-    ticketNumber,
-    eventId,
-    userEmail,
-    timestamp: Date.now(),
-    type: 'TICKET_VERIFICATION'
+    t: ticketNumber,        // shortened key
+    e: eventId,            // shortened key
+    u: userEmail,          // shortened key
+    ts: Date.now(),        // shortened key
+    type: 'TKT'           // shortened value
   };
-  
+
   // Encode as base64 for QR code
-  return btoa(JSON.stringify(verificationData));
+  const qrData = btoa(JSON.stringify(verificationData));
+  console.log('📧 QR data size:', qrData.length, 'characters');
+  return qrData;
 };
 
 // Send ticket email to user
 export const sendTicketEmail = async (ticketData) => {
+  console.log('📧 sendTicketEmail function called');
+  console.log('📧 Function parameters received:', ticketData);
+
   try {
     console.log('📧 Starting email send process...');
+
+    // Check if emailjs is available
+    if (typeof emailjs === 'undefined') {
+      throw new Error('EmailJS library not loaded');
+    }
+
     console.log('📧 EmailJS Config:', {
       serviceId: EMAIL_CONFIG.serviceId,
       templateId: EMAIL_CONFIG.templateId,
       publicKey: EMAIL_CONFIG.publicKey ? EMAIL_CONFIG.publicKey.substring(0, 10) + '...' : 'NOT_SET'
     });
+
+    // Validate input data
+    if (!ticketData || !ticketData.userEmail) {
+      throw new Error('Invalid ticket data: missing email');
+    }
+
     console.log('📧 Sending ticket email to:', ticketData.userEmail);
-    console.log('📧 Ticket data:', ticketData);
 
     // Validate EmailJS configuration
-    if (EMAIL_CONFIG.serviceId === 'service_default' ||
-        EMAIL_CONFIG.templateId === 'template_default' ||
-        EMAIL_CONFIG.publicKey === 'your_public_key') {
+    if (!EMAIL_CONFIG.serviceId || EMAIL_CONFIG.serviceId === 'service_default' ||
+        !EMAIL_CONFIG.templateId || EMAIL_CONFIG.templateId === 'template_default' ||
+        !EMAIL_CONFIG.publicKey || EMAIL_CONFIG.publicKey === 'your_public_key') {
       throw new Error('EmailJS configuration not properly set. Please check your .env.local file.');
+    }
+
+    // Check if event image is base64 and too large
+    let eventImageUrl = ticketData.eventImage || '';
+    if (eventImageUrl.startsWith('data:image/')) {
+      console.log('📧 Base64 image detected, size:', eventImageUrl.length, 'characters');
+      if (eventImageUrl.length > 10000) { // ~10KB limit for base64
+        console.log('📧 Image too large for email, using placeholder');
+        eventImageUrl = 'https://via.placeholder.com/400x200/667eea/ffffff?text=Event+Image';
+      }
     }
 
     const emailParams = {
       to_email: ticketData.userEmail,
-      to_name: ticketData.userName,
-      event_title: ticketData.eventTitle,
-      event_date: ticketData.eventDate,
-      event_time: ticketData.eventTime,
+      to_name: ticketData.userName || 'Guest',
+      event_title: ticketData.eventTitle || 'Event',
+      event_date: ticketData.eventDate || 'TBA',
+      event_time: ticketData.eventTime || 'TBA',
       event_location: ticketData.eventLocation || 'TBA',
-      ticket_number: ticketData.ticketNumber,
+      ticket_number: ticketData.ticketNumber || 'N/A',
       time_slot: ticketData.timeSlot || 'General Admission',
-      verification_qr: ticketData.verificationQR,
-      event_image: ticketData.eventImage || ''
+      verification_qr: ticketData.verificationQR || '',
+      event_image: eventImageUrl
     };
 
-    console.log('📧 Email parameters:', emailParams);
+    // Calculate approximate size
+    const paramsSize = JSON.stringify(emailParams).length;
+    console.log('📧 Email parameters size:', paramsSize, 'characters (~' + Math.round(paramsSize/1024) + 'KB)');
 
+    console.log('📧 Email parameters prepared:', emailParams);
+
+    console.log('📧 Calling emailjs.send...');
     const result = await emailjs.send(
       EMAIL_CONFIG.serviceId,
       EMAIL_CONFIG.templateId,
@@ -110,13 +150,20 @@ export const sendTicketEmail = async (ticketData) => {
     return { success: true, result };
 
   } catch (error) {
-    console.error('❌ Email sending failed:', error);
+    console.error('❌ Email sending failed in sendTicketEmail:', error);
+    console.error('❌ Error type:', typeof error);
+    console.error('❌ Error message:', error?.message || 'Unknown error');
     console.error('❌ Error details:', {
-      message: error.message,
-      status: error.status,
-      text: error.text
+      message: error?.message || 'No message',
+      status: error?.status || 'No status',
+      text: error?.text || 'No text',
+      stack: error?.stack || 'No stack'
     });
-    return { success: false, error: error.message };
+
+    return {
+      success: false,
+      error: error?.message || error?.toString() || 'Unknown email error'
+    };
   }
 };
 
@@ -124,55 +171,64 @@ export const sendTicketEmail = async (ticketData) => {
 export const verifyTicketQR = async (qrData, eventId) => {
   try {
     console.log('🔍 Verifying ticket QR code...');
-    
+
     // Decode QR data
     const decodedData = JSON.parse(atob(qrData));
-    
+
+    // Handle both old and new format
+    const ticketData = {
+      ticketNumber: decodedData.t || decodedData.ticketNumber,
+      eventId: decodedData.e || decodedData.eventId,
+      userEmail: decodedData.u || decodedData.userEmail,
+      timestamp: decodedData.ts || decodedData.timestamp,
+      type: decodedData.type
+    };
+
     // Validate QR code structure
-    if (decodedData.type !== 'TICKET_VERIFICATION') {
-      return { 
-        valid: false, 
+    if (ticketData.type !== 'TKT' && ticketData.type !== 'TICKET_VERIFICATION') {
+      return {
+        valid: false,
         message: 'Invalid QR code format',
         type: 'INVALID_FORMAT'
       };
     }
-    
+
     // Check if QR is for the correct event
-    if (decodedData.eventId !== eventId) {
-      return { 
-        valid: false, 
+    if (ticketData.eventId !== eventId) {
+      return {
+        valid: false,
         message: 'QR code is for a different event',
         type: 'WRONG_EVENT'
       };
     }
-    
+
     // Check if QR is not too old (24 hours validity)
-    const qrAge = Date.now() - decodedData.timestamp;
+    const qrAge = Date.now() - ticketData.timestamp;
     const maxAge = 24 * 60 * 60 * 1000; // 24 hours
-    
+
     if (qrAge > maxAge) {
-      return { 
-        valid: false, 
+      return {
+        valid: false,
         message: 'QR code has expired',
         type: 'EXPIRED'
       };
     }
-    
+
     // TODO: Check against database to ensure ticket wasn't already used
     // This would require additional database queries
-    
+
     console.log('✅ QR code verified successfully');
-    return { 
-      valid: true, 
+    return {
+      valid: true,
       message: 'Valid ticket',
-      ticketData: decodedData,
+      ticketData: ticketData,
       type: 'VALID'
     };
-    
+
   } catch (error) {
     console.error('❌ QR verification failed:', error);
-    return { 
-      valid: false, 
+    return {
+      valid: false,
       message: 'Invalid QR code data',
       type: 'DECODE_ERROR'
     };
