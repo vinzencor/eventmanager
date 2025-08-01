@@ -30,7 +30,15 @@ const EventPreview = () => {
   }, [eventId]);
 
   const getRegistrationUrl = () => {
-    return `${window.location.origin}/register/${event.qrCode}`;
+    // Priority order for base URL:
+    // 1. Environment variable (if set)
+    // 2. Current window origin (default)
+    const baseUrl = process.env.REACT_APP_REGISTRATION_URL || window.location.origin;
+
+    const registrationUrl = `${baseUrl}/register/${event.qrCode}`;
+    console.log('Generated registration URL:', registrationUrl);
+
+    return registrationUrl;
   };
 
   const downloadQR = () => {
