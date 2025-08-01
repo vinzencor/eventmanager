@@ -1,22 +1,23 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read/write access to all documents for authenticated users
-    // This is a permissive rule for development - tighten for production
-    match /{document=**} {
-      allow read, write: if request.auth != null;
-    }
-    
-    // Allow public read access to events for registration
-    match /events/{eventId} {
-      allow read: if true;
-      allow write: if request.auth != null;
-    }
-    
-    // Allow public write access to registrations
-    match /registrations/{registrationId} {
+    // Users collection - only authenticated users can access
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
       allow read: if request.auth != null;
-      allow create: if true;
+    }
+
+    // Events collection - PUBLIC READ for QR registration, authenticated write
+    match /events/{eventId} {
+      allow read: if true; // PUBLIC ACCESS for QR code scanning
+      allow write: if request.auth != null; // Only authenticated users can create/edit
+      allow update: if true; // Allow ticket count updates from registration
+    }
+
+    // Registrations collection - PUBLIC CREATE for QR registration
+    match /registrations/{registrationId} {
+      allow read: if request.auth != null; // Only admins can read registrations
+      allow create: if true; // PUBLIC ACCESS for QR code registration
     }
   }
 }

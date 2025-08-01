@@ -20,23 +20,32 @@ const EventRegistration = () => {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
+        console.log('🔍 Fetching event with QR code:', qrCode);
+
         // Find event by QR code
         const eventsRef = collection(db, 'events');
         const snapshot = await getDocs(query(eventsRef, where('qrCode', '==', qrCode)));
-        
+
+        console.log('📊 Query result:', snapshot.size, 'documents found');
+
         if (!snapshot.empty) {
           const eventDoc = snapshot.docs[0];
           const eventData = { id: eventDoc.id, ...eventDoc.data() };
+          console.log('✅ Event found:', eventData.title);
           setEvent(eventData);
-          
+
           // Set default time slot if only one available
           if (eventData.timeSlots && eventData.timeSlots.length === 1) {
             setFormData(prev => ({ ...prev, timeSlot: eventData.timeSlots[0] }));
           }
         } else {
+          console.log('❌ No event found with QR code:', qrCode);
           setError('Event not found or QR code is invalid');
         }
       } catch (error) {
+        console.error('🚨 Error fetching event:', error);
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
         setError('Failed to load event: ' + error.message);
       } finally {
         setLoading(false);
@@ -67,7 +76,9 @@ const EventRegistration = () => {
     try {
       setError('');
       setSubmitting(true);
-      
+
+      console.log('🎫 Starting registration process...');
+
       // Validate form
       if (!formData.name || !formData.email || !formData.phone) {
         setError('Please fill in all required fields');
@@ -78,6 +89,8 @@ const EventRegistration = () => {
         setError('Please select a time slot');
         return;
       }
+
+      console.log('✅ Form validation passed');
 
       // Create registration document
       const registrationData = {
@@ -91,17 +104,25 @@ const EventRegistration = () => {
         qrCode: qrCode
       };
 
+      console.log('📝 Creating registration document...');
       await addDoc(collection(db, 'registrations'), registrationData);
-      
+      console.log('✅ Registration document created');
+
       // Update event ticket counts
+      console.log('🔄 Updating ticket counts...');
       await updateDoc(doc(db, 'events', event.id), {
         registrations: increment(1),
         availableTickets: increment(-1)
       });
-      
+      console.log('✅ Ticket counts updated');
+
+      console.log('🎉 Registration completed successfully!');
       setSuccess(true);
-      
+
     } catch (error) {
+      console.error('🚨 Registration failed:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
       setError('Failed to register: ' + error.message);
     } finally {
       setSubmitting(false);
