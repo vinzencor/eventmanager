@@ -9,7 +9,41 @@ const EMAIL_CONFIG = {
 };
 
 // Initialize EmailJS
+console.log('🔧 Initializing EmailJS with config:', {
+  serviceId: EMAIL_CONFIG.serviceId,
+  templateId: EMAIL_CONFIG.templateId,
+  publicKey: EMAIL_CONFIG.publicKey ? EMAIL_CONFIG.publicKey.substring(0, 10) + '...' : 'NOT_SET'
+});
+
 emailjs.init(EMAIL_CONFIG.publicKey);
+
+// Test EmailJS configuration
+export const testEmailJS = async () => {
+  try {
+    console.log('🧪 Testing EmailJS configuration...');
+    const testParams = {
+      to_email: 'test@example.com',
+      to_name: 'Test User',
+      event_title: 'Test Event',
+      event_date: '2024-01-01',
+      event_time: '10:00 AM',
+      ticket_number: 'TEST-123',
+      verification_qr: 'test-qr-data'
+    };
+
+    const result = await emailjs.send(
+      EMAIL_CONFIG.serviceId,
+      EMAIL_CONFIG.templateId,
+      testParams
+    );
+
+    console.log('✅ EmailJS test successful:', result);
+    return { success: true, result };
+  } catch (error) {
+    console.error('❌ EmailJS test failed:', error);
+    return { success: false, error: error.message };
+  }
+};
 
 // Generate unique ticket number
 export const generateTicketNumber = () => {
@@ -35,8 +69,22 @@ export const generateVerificationQRData = (ticketNumber, eventId, userEmail) => 
 // Send ticket email to user
 export const sendTicketEmail = async (ticketData) => {
   try {
+    console.log('📧 Starting email send process...');
+    console.log('📧 EmailJS Config:', {
+      serviceId: EMAIL_CONFIG.serviceId,
+      templateId: EMAIL_CONFIG.templateId,
+      publicKey: EMAIL_CONFIG.publicKey ? EMAIL_CONFIG.publicKey.substring(0, 10) + '...' : 'NOT_SET'
+    });
     console.log('📧 Sending ticket email to:', ticketData.userEmail);
-    
+    console.log('📧 Ticket data:', ticketData);
+
+    // Validate EmailJS configuration
+    if (EMAIL_CONFIG.serviceId === 'service_default' ||
+        EMAIL_CONFIG.templateId === 'template_default' ||
+        EMAIL_CONFIG.publicKey === 'your_public_key') {
+      throw new Error('EmailJS configuration not properly set. Please check your .env.local file.');
+    }
+
     const emailParams = {
       to_email: ticketData.userEmail,
       to_name: ticketData.userName,
@@ -50,6 +98,8 @@ export const sendTicketEmail = async (ticketData) => {
       event_image: ticketData.eventImage || ''
     };
 
+    console.log('📧 Email parameters:', emailParams);
+
     const result = await emailjs.send(
       EMAIL_CONFIG.serviceId,
       EMAIL_CONFIG.templateId,
@@ -58,9 +108,14 @@ export const sendTicketEmail = async (ticketData) => {
 
     console.log('✅ Email sent successfully:', result);
     return { success: true, result };
-    
+
   } catch (error) {
     console.error('❌ Email sending failed:', error);
+    console.error('❌ Error details:', {
+      message: error.message,
+      status: error.status,
+      text: error.text
+    });
     return { success: false, error: error.message };
   }
 };

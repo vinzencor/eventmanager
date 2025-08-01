@@ -127,7 +127,10 @@ const EventRegistration = () => {
       console.log('✅ Ticket counts updated');
 
       // Send ticket email
-      console.log('📧 Sending ticket email...');
+      console.log('📧 Preparing to send ticket email...');
+      console.log('📧 Event data:', event);
+      console.log('📧 Form data:', formData);
+
       const ticketData = {
         userEmail: formData.email,
         userName: formData.name,
@@ -141,14 +144,18 @@ const EventRegistration = () => {
         eventImage: event.imageUrl
       };
 
+      console.log('📧 Calling sendTicketEmail with data:', ticketData);
       const emailResult = await sendTicketEmail(ticketData);
+      console.log('📧 Email result:', emailResult);
 
       if (emailResult.success) {
         console.log('✅ Ticket email sent successfully');
         // Update registration to mark email as sent
         await updateDoc(registrationDoc, { ticketSent: true });
       } else {
-        console.warn('⚠️ Email sending failed, but registration completed:', emailResult.error);
+        console.error('❌ Email sending failed:', emailResult.error);
+        // Show user-friendly error message
+        alert(`Registration successful, but email failed to send: ${emailResult.error}. Please contact support with your ticket number: ${ticketNumber}`);
       }
 
       console.log('🎉 Registration completed successfully!');
