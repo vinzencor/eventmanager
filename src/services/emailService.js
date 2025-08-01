@@ -324,3 +324,47 @@ export const createTicketHTML = (ticketData) => {
     </html>
   `;
 };
+
+// Send check-in confirmation email to user
+export const sendCheckInConfirmationEmail = async (ticketData, eventData, adminEmail) => {
+  try {
+    console.log('📧 Sending check-in confirmation email to:', ticketData.email);
+
+    // Validate EmailJS configuration
+    if (EMAIL_CONFIG.serviceId === 'service_default' ||
+        EMAIL_CONFIG.templateId === 'template_default' ||
+        EMAIL_CONFIG.publicKey === 'your_public_key') {
+      console.warn('EmailJS not configured, skipping confirmation email');
+      return { success: false, error: 'EmailJS not configured' };
+    }
+
+    const emailParams = {
+      to_email: ticketData.email,
+      to_name: ticketData.name,
+      event_title: eventData.title,
+      event_date: new Date(eventData.date).toLocaleDateString(),
+      event_time: eventData.time,
+      event_location: eventData.location || 'TBA',
+      ticket_number: ticketData.ticketNumber,
+      check_in_time: new Date().toLocaleString(),
+      admin_email: adminEmail,
+      confirmation_message: '✅ Your ticket has been successfully verified and you are checked in!'
+    };
+
+    console.log('📧 Sending check-in confirmation...');
+
+    // Use the same template but with different content
+    const result = await emailjs.send(
+      EMAIL_CONFIG.serviceId,
+      EMAIL_CONFIG.templateId, // Use existing template
+      emailParams
+    );
+
+    console.log('✅ Check-in confirmation email sent successfully:', result);
+    return { success: true, result };
+
+  } catch (error) {
+    console.error('❌ Check-in confirmation email failed:', error);
+    return { success: false, error: error.message };
+  }
+};
