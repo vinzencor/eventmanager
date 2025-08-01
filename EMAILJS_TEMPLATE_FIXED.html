@@ -1,0 +1,76 @@
+Subject: 🎫 Your Event Ticket - {{event_title}}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Event Ticket</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5;">
+    <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center;">
+            <h1 style="margin: 0; font-size: 28px;">🎫 Event Ticket</h1>
+            <p style="margin: 10px 0 0 0; font-size: 16px;">Your admission pass</p>
+        </div>
+        
+        <!-- Event Image (will show if URL is provided) -->
+        <img src="{{event_image}}" alt="Event" style="width: 100%; height: 200px; object-fit: cover; display: block;">
+        
+        <!-- Content -->
+        <div style="padding: 30px;">
+            <h2 style="color: #333; margin-top: 0;">{{event_title}}</h2>
+            
+            <!-- Ticket Number -->
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0; text-align: center;">
+                <div style="font-size: 18px; font-weight: bold; color: #333;">
+                    Ticket #{{ticket_number}}
+                </div>
+            </div>
+            
+            <!-- Event Details -->
+            <div style="margin: 20px 0;">
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
+                    <strong>Attendee:</strong>
+                    <span>{{to_name}}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
+                    <strong>Date:</strong>
+                    <span>{{event_date}}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
+                    <strong>Time:</strong>
+                    <span>{{event_time}}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
+                    <strong>Location:</strong>
+                    <span>{{event_location}}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
+                    <strong>Time Slot:</strong>
+                    <span>{{time_slot}}</span>
+                </div>
+            </div>
+            
+            <!-- QR Code Section -->
+            <div style="text-align: center; margin: 30px 0; padding: 20px; background: #f8f9fa; border-radius: 5px;">
+                <h3 style="color: #333; margin-top: 0;">🔍 Verification QR Code</h3>
+                <p style="color: #666; margin: 10px 0;">Show this QR code at the event entrance</p>
+                <div style="margin: 20px 0;">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{verification_qr}}" 
+                         alt="Verification QR Code" 
+                         style="border: 2px solid #ddd; border-radius: 5px; display: block; margin: 0 auto;">
+                </div>
+                <p style="font-size: 12px; color: #666; margin: 0;">This QR code is unique to your ticket</p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div style="text-align: center; padding: 20px; color: #666; font-size: 12px; background: #f8f9fa;">
+            <p style="margin: 0 0 10px 0;">Thank you for registering! Please arrive 15 minutes before your scheduled time.</p>
+            <p style="margin: 0;">For support, contact the event organizer.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,17 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import { verifyTicketQR } from '../../services/emailService';
 
 const QRScanner = () => {
   const { eventId } = useParams();
+  const navigate = useNavigate();
   const [event, setEvent] = useState(null);
   const [scanning, setScanning] = useState(false);
   const [scanResult, setScanResult] = useState(null);
   const [manualInput, setManualInput] = useState('');
   const [verificationHistory, setVerificationHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({ approved: 0, rejected: 0, total: 0 });
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
@@ -127,16 +129,22 @@ const QRScanner = () => {
       }
       
       // Add to verification history
-      setVerificationHistory(prev => [
-        {
-          id: Date.now(),
-          success: verification.valid,
-          message: verification.message,
-          timestamp: new Date(),
-          ticketData: verification.valid ? verification.ticketData : null
-        },
-        ...prev.slice(0, 9) // Keep last 10 entries
-      ]);
+      const newEntry = {
+        id: Date.now(),
+        success: verification.valid,
+        message: verification.message,
+        timestamp: new Date(),
+        ticketData: verification.valid ? verification.ticketData : null
+      };
+
+      setVerificationHistory(prev => [newEntry, ...prev.slice(0, 9)]); // Keep last 10 entries
+
+      // Update stats
+      setStats(prev => ({
+        approved: prev.approved + (verification.valid ? 1 : 0),
+        rejected: prev.rejected + (verification.valid ? 0 : 1),
+        total: prev.total + 1
+      }));
       
     } catch (error) {
       console.error('Verification error:', error);
@@ -183,6 +191,15 @@ const QRScanner = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <button
+              onClick={() => navigate(-1)}
+              className="text-primary-600 hover:text-primary-800 flex items-center"
+            >
+              ← Back to Dashboard
+            </button>
+          </div>
+
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">🔍 Ticket Scanner</h1>
@@ -191,11 +208,23 @@ const QRScanner = () => {
                 {new Date(event.date).toLocaleDateString()} at {event.time}
               </p>
             </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-primary-600">
-                {event.registrations || 0}
+
+            <div className="flex space-x-6">
+              {/* Scanning Stats */}
+              <div className="text-center">
+                <div className="text-lg font-bold text-green-600">{stats.approved}</div>
+                <div className="text-xs text-gray-500">Approved</div>
               </div>
-              <div className="text-sm text-gray-500">Total Registrations</div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-red-600">{stats.rejected}</div>
+                <div className="text-xs text-gray-500">Rejected</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary-600">
+                  {event.registrations || 0}
+                </div>
+                <div className="text-sm text-gray-500">Total Registered</div>
+              </div>
             </div>
           </div>
         </div>

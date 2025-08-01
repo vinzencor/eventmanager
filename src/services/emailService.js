@@ -123,15 +123,23 @@ export const sendTicketEmail = async (ticketData) => {
     const emailParams = {
       to_email: ticketData.userEmail,
       to_name: ticketData.userName || 'Guest',
+      user_email: ticketData.userEmail, // Alternative parameter name
       event_title: ticketData.eventTitle || 'Event',
       event_date: ticketData.eventDate || 'TBA',
       event_time: ticketData.eventTime || 'TBA',
       event_location: ticketData.eventLocation || 'TBA',
       ticket_number: ticketData.ticketNumber || 'N/A',
       time_slot: ticketData.timeSlot || 'General Admission',
-      verification_qr: ticketData.verificationQR || '',
-      event_image: eventImageUrl
+      verification_qr: encodeURIComponent(ticketData.verificationQR || ''),
+      event_image: eventImageUrl || 'https://via.placeholder.com/400x200/667eea/ffffff?text=Event+Image'
     };
+
+    console.log('📧 Email will be sent to:', ticketData.userEmail);
+    console.log('📧 Email parameters (recipient check):', {
+      to_email: emailParams.to_email,
+      user_email: emailParams.user_email,
+      to_name: emailParams.to_name
+    });
 
     // Calculate approximate size
     const paramsSize = JSON.stringify(emailParams).length;

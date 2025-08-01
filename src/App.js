@@ -12,6 +12,7 @@ import EventPreview from './components/events/EventPreview';
 import EventRegistration from './components/registration/EventRegistration';
 import EditEvent from './components/events/EditEvent';
 import QRScanner from './components/admin/QRScanner';
+import Navbar from './components/layout/Navbar';
 import InitialSetup from './components/setup/InitialSetup';
 
 
@@ -68,6 +69,7 @@ function App() {
     <AuthProvider>
       <Router>
         <div className="App">
+          <Navbar />
           <Routes>
             {/* Setup Route */}
             <Route path="/setup" element={<InitialSetup onSetupComplete={() => setSetupComplete(true)} />} />

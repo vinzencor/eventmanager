@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import QRCode from 'react-qr-code';
+import { useAuth } from '../../contexts/AuthContext';
 
 const EventPreview = () => {
   const { eventId } = useParams();
+  const navigate = useNavigate();
+  const { userRole } = useAuth();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -236,7 +239,13 @@ const EventPreview = () => {
                   onClick={downloadQR}
                   className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium"
                 >
-                  Download QR Code
+                  📥 Download QR
+                </button>
+                <button
+                  onClick={() => navigate(`/admin/events/${eventId}/scan`)}
+                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                >
+                  📱 Scan Tickets
                 </button>
                 <a
                   href={getRegistrationUrl()}
@@ -244,7 +253,7 @@ const EventPreview = () => {
                   rel="noopener noreferrer"
                   className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md text-sm font-medium text-center"
                 >
-                  Test Registration
+                  🔗 Test Registration
                 </a>
               </div>
             </div>
