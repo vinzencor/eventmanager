@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { doc, collection, addDoc, updateDoc, increment, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/config';
+import { generateTicketNumber, generateVerificationQRData, sendTicketEmail } from '../../services/emailService';
 
 const EventRegistration = () => {
   const { qrCode } = useParams();
@@ -92,7 +93,13 @@ const EventRegistration = () => {
 
       console.log('✅ Form validation passed');
 
-      // Create registration document
+      // Generate ticket number and verification QR
+      const ticketNumber = generateTicketNumber();
+      const verificationQR = generateVerificationQRData(ticketNumber, event.id, formData.email);
+
+      console.log('🎫 Generated ticket number:', ticketNumber);
+
+      // Create registration document with ticket info
       const registrationData = {
         eventId: event.id,
         eventTitle: event.title,
@@ -101,11 +108,14 @@ const EventRegistration = () => {
         phone: formData.phone,
         timeSlot: formData.timeSlot || null,
         registeredAt: new Date(),
-        qrCode: qrCode
+        qrCode: qrCode,
+        ticketNumber: ticketNumber,
+        verificationQR: verificationQR,
+        ticketSent: false
       };
 
       console.log('📝 Creating registration document...');
-      await addDoc(collection(db, 'registrations'), registrationData);
+      const registrationDoc = await addDoc(collection(db, 'registrations'), registrationData);
       console.log('✅ Registration document created');
 
       // Update event ticket counts
@@ -115,6 +125,31 @@ const EventRegistration = () => {
         availableTickets: increment(-1)
       });
       console.log('✅ Ticket counts updated');
+
+      // Send ticket email
+      console.log('📧 Sending ticket email...');
+      const ticketData = {
+        userEmail: formData.email,
+        userName: formData.name,
+        eventTitle: event.title,
+        eventDate: new Date(event.date).toLocaleDateString(),
+        eventTime: event.time,
+        eventLocation: event.location,
+        ticketNumber: ticketNumber,
+        timeSlot: formData.timeSlot,
+        verificationQR: verificationQR,
+        eventImage: event.imageUrl
+      };
+
+      const emailResult = await sendTicketEmail(ticketData);
+
+      if (emailResult.success) {
+        console.log('✅ Ticket email sent successfully');
+        // Update registration to mark email as sent
+        await updateDoc(registrationDoc, { ticketSent: true });
+      } else {
+        console.warn('⚠️ Email sending failed, but registration completed:', emailResult.error);
+      }
 
       console.log('🎉 Registration completed successfully!');
       setSuccess(true);

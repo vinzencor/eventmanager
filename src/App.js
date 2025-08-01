@@ -10,6 +10,8 @@ import AdminDashboard from './components/admin/AdminDashboard';
 import CreateEvent from './components/events/CreateEvent';
 import EventPreview from './components/events/EventPreview';
 import EventRegistration from './components/registration/EventRegistration';
+import EditEvent from './components/events/EditEvent';
+import QRScanner from './components/admin/QRScanner';
 import InitialSetup from './components/setup/InitialSetup';
 
 
@@ -108,6 +110,33 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['super_admin', 'temp_admin']}>
                   <EventPreview />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin/events/:eventId"
+              element={
+                <ProtectedRoute allowedRoles={['super_admin', 'temp_admin']}>
+                  <EventPreview />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin/events/:eventId/edit"
+              element={
+                <ProtectedRoute allowedRoles={['super_admin', 'temp_admin']}>
+                  <EditEvent />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin/events/:eventId/scan"
+              element={
+                <ProtectedRoute allowedRoles={['super_admin', 'temp_admin']}>
+                  <QRScanner />
                 </ProtectedRoute>
               }
             />

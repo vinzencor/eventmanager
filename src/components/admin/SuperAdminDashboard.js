@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, orderBy, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase/config';
+import { useNavigate } from 'react-router-dom';
 import CreateTempAdmin from './CreateTempAdmin';
 import UserManagement from './UserManagement';
 import { useRealTimeEvents } from '../../hooks/useRealTimeTickets';
 
 const SuperAdminDashboard = () => {
   const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
   const [tempAdmins, setTempAdmins] = useState([]);
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
@@ -41,6 +43,36 @@ const SuperAdminDashboard = () => {
     } catch (error) {
       console.error('Failed to log out:', error);
     }
+  };
+
+  // Event Management Functions
+  const handleCreateEvent = () => {
+    navigate('/admin/events/create');
+  };
+
+  const handleViewEvent = (eventId) => {
+    navigate(`/admin/events/${eventId}`);
+  };
+
+  const handleEditEvent = (eventId) => {
+    navigate(`/admin/events/${eventId}/edit`);
+  };
+
+  const handleDeleteEvent = async (eventId, eventTitle) => {
+    if (window.confirm(`Are you sure you want to delete "${eventTitle}"? This action cannot be undone.`)) {
+      try {
+        await deleteDoc(doc(db, 'events', eventId));
+        console.log('Event deleted successfully');
+        // The real-time listener will automatically update the events list
+      } catch (error) {
+        console.error('Error deleting event:', error);
+        alert('Failed to delete event. Please try again.');
+      }
+    }
+  };
+
+  const handleScanTickets = (eventId) => {
+    navigate(`/admin/events/${eventId}/scan`);
   };
 
   if (loading) {
@@ -174,11 +206,19 @@ const SuperAdminDashboard = () => {
         {activeTab === 'temp-admins' && <UserManagement tempAdmins={tempAdmins} />}
         {activeTab === 'events' && (
           <div className="bg-white shadow overflow-hidden sm:rounded-md">
-            <div className="px-4 py-5 sm:px-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">All Events</h3>
-              <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                Complete list of events created by temporary admins
-              </p>
+            <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
+              <div>
+                <h3 className="text-lg leading-6 font-medium text-gray-900">All Events</h3>
+                <p className="mt-1 max-w-2xl text-sm text-gray-500">
+                  Manage all events in the system
+                </p>
+              </div>
+              <button
+                onClick={handleCreateEvent}
+                className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+              >
+                ➕ Create Event
+              </button>
             </div>
             <ul className="divide-y divide-gray-200">
               {events.map((event) => (
@@ -201,8 +241,34 @@ const SuperAdminDashboard = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="text-sm text-gray-500">
-                      {event.registrations || 0} / {event.ticketCount} registered
+                    <div className="flex items-center space-x-2">
+                      <div className="text-sm text-gray-500 mr-4">
+                        {event.registrations || 0} / {event.ticketCount} registered
+                      </div>
+                      <button
+                        onClick={() => handleViewEvent(event.id)}
+                        className="text-primary-600 hover:text-primary-900 text-sm font-medium"
+                      >
+                        👁️ View
+                      </button>
+                      <button
+                        onClick={() => handleEditEvent(event.id)}
+                        className="text-yellow-600 hover:text-yellow-900 text-sm font-medium"
+                      >
+                        ✏️ Edit
+                      </button>
+                      <button
+                        onClick={() => handleScanTickets(event.id)}
+                        className="text-green-600 hover:text-green-900 text-sm font-medium"
+                      >
+                        📱 Scan
+                      </button>
+                      <button
+                        onClick={() => handleDeleteEvent(event.id, event.title)}
+                        className="text-red-600 hover:text-red-900 text-sm font-medium"
+                      >
+                        🗑️ Delete
+                      </button>
                     </div>
                   </div>
                 </li>

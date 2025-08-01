@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useRealTimeEvents } from '../../hooks/useRealTimeTickets';
+import { deleteDoc, doc } from 'firebase/firestore';
+import { db } from '../../firebase/config';
 
 const AdminDashboard = () => {
   const { currentUser, logout, userRole } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('all');
   const { events, loading } = useRealTimeEvents(currentUser?.uid, userRole);
 
@@ -14,6 +17,35 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error('Failed to log out:', error);
     }
+  };
+
+  // Event Management Functions
+  const handleCreateEvent = () => {
+    navigate('/admin/events/create');
+  };
+
+  const handleViewEvent = (eventId) => {
+    navigate(`/admin/events/${eventId}`);
+  };
+
+  const handleEditEvent = (eventId) => {
+    navigate(`/admin/events/${eventId}/edit`);
+  };
+
+  const handleDeleteEvent = async (eventId, eventTitle) => {
+    if (window.confirm(`Are you sure you want to delete "${eventTitle}"? This action cannot be undone.`)) {
+      try {
+        await deleteDoc(doc(db, 'events', eventId));
+        console.log('Event deleted successfully');
+      } catch (error) {
+        console.error('Error deleting event:', error);
+        alert('Failed to delete event. Please try again.');
+      }
+    }
+  };
+
+  const handleScanTickets = (eventId) => {
+    navigate(`/admin/events/${eventId}/scan`);
   };
 
   const getFilteredEvents = () => {
@@ -228,19 +260,46 @@ const AdminDashboard = () => {
                           {event.availableTickets} available
                         </div>
                       </div>
-                      <div className="flex flex-col space-y-2">
-                        <Link
-                          to={`/admin/events/${event.id}/preview`}
-                          className="bg-primary-600 hover:bg-primary-700 text-white px-3 py-1 rounded text-sm font-medium text-center"
-                        >
-                          View
-                        </Link>
-                        <Link
-                          to={`/register/${event.qrCode}`}
-                          className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm font-medium text-center"
-                        >
-                          QR Link
-                        </Link>
+                      <div className="flex flex-col space-y-1">
+                        <div className="flex space-x-1">
+                          <button
+                            onClick={() => handleViewEvent(event.id)}
+                            className="bg-primary-600 hover:bg-primary-700 text-white px-2 py-1 rounded text-xs font-medium"
+                            title="View Event"
+                          >
+                            👁️
+                          </button>
+                          <button
+                            onClick={() => handleEditEvent(event.id)}
+                            className="bg-yellow-600 hover:bg-yellow-700 text-white px-2 py-1 rounded text-xs font-medium"
+                            title="Edit Event"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() => handleScanTickets(event.id)}
+                            className="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs font-medium"
+                            title="Scan Tickets"
+                          >
+                            📱
+                          </button>
+                        </div>
+                        <div className="flex space-x-1">
+                          <Link
+                            to={`/register/${event.qrCode}`}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs font-medium text-center flex-1"
+                            title="Registration Link"
+                          >
+                            🔗
+                          </Link>
+                          <button
+                            onClick={() => handleDeleteEvent(event.id, event.title)}
+                            className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs font-medium"
+                            title="Delete Event"
+                          >
+                            🗑️
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
