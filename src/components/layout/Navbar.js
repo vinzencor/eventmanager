@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { verifyTicketQR, sendCheckInConfirmationEmail } from '../../services/emailService';
@@ -235,50 +235,51 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Responsive Navbar */}
+      {/* Enhanced Responsive Navbar */}
       <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            {/* Logo/Brand */}
-            <div className="flex items-center">
-              <Link to="/admin/dashboard" className="flex-shrink-0">
-                <h1 className="text-lg sm:text-xl font-bold text-primary-600">
-                  <span className="hidden sm:inline">Event Manager</span>
-                  <span className="sm:hidden">EM</span>
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            {/* Logo/Brand - Improved */}
+            <div className="flex items-center min-w-0">
+              <Link to="/dashboard" className="flex-shrink-0 hover:opacity-80 transition-opacity">
+                <h1 className="text-base sm:text-lg lg:text-xl font-bold text-primary-600">
+                  <span className="hidden xs:inline">Event Manager</span>
+                  <span className="xs:hidden">EM</span>
                 </h1>
               </Link>
             </div>
 
-            {/* Right side - responsive */}
-            <div className="flex items-center space-x-2 sm:space-x-4">
-              {/* QR Scanner Button - responsive */}
+            {/* Right side - Enhanced responsive */}
+            <div className="flex items-center space-x-1 sm:space-x-2 lg:space-x-4">
+              {/* QR Scanner Button - Enhanced */}
               <button
                 onClick={openScanner}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium flex items-center space-x-1 sm:space-x-2 transition-all duration-200 hover:scale-105"
+                className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium flex items-center space-x-1 transition-all duration-200 hover:scale-105 shadow-sm hover:shadow-md"
                 title="Quick QR Scanner"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M12 12h.01M12 12v.01M12 21.02V21M4.01 12H4m0 0h.01M4 12v.01" />
                 </svg>
-                <span className="hidden sm:inline">📱 Scan QR</span>
+                <span className="hidden sm:inline">📱 Scan</span>
                 <span className="sm:hidden">📱</span>
               </button>
 
-              {/* User Menu - responsive */}
-              <div className="flex items-center space-x-2 sm:space-x-3">
-                <div className="hidden md:block">
-                  <span className="text-sm text-gray-700 truncate max-w-32">
+              {/* User Menu - Enhanced responsive */}
+              <div className="flex items-center space-x-1 sm:space-x-2 lg:space-x-3">
+                <div className="hidden lg:block">
+                  <span className="text-xs sm:text-sm text-gray-700 truncate max-w-24 lg:max-w-32">
                     {currentUser.email}
                   </span>
                 </div>
-                <span className="text-xs bg-primary-100 text-primary-800 px-2 py-1 rounded-full">
+                <span className="text-xs bg-primary-100 text-primary-800 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-medium">
                   {userRole === 'super_admin' ? 'Super' : 'Admin'}
                 </span>
                 <button
                   onClick={handleLogout}
-                  className="text-gray-500 hover:text-gray-700 text-xs sm:text-sm px-2 py-1 rounded hover:bg-gray-100 transition-colors"
+                  className="bg-red-600 hover:bg-red-700 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded text-xs sm:text-sm font-medium transition-colors"
+                  title="Logout"
                 >
-                  <span className="hidden sm:inline">Logout</span>
+                  <span className="sm:inline">Logout</span>
                   <span className="sm:hidden">⏻</span>
                 </button>
               </div>
@@ -287,20 +288,20 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Fully Responsive QR Scanner Modal */}
+      {/* Enhanced Responsive QR Scanner Modal */}
       {showScanner && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-start sm:items-center justify-center z-50 p-2 sm:p-4">
-          <div className="bg-white rounded-lg w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl max-h-[98vh] sm:max-h-[95vh] overflow-y-auto shadow-2xl mt-2 sm:mt-0">
-            {/* Header - Responsive */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-3 sm:px-4 md:px-6 py-3 sm:py-4 rounded-t-lg">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-start sm:items-center justify-center z-50 p-1 sm:p-4">
+          <div className="bg-white rounded-lg sm:rounded-xl w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl max-h-[99vh] sm:max-h-[95vh] overflow-y-auto shadow-2xl mt-1 sm:mt-0">
+            {/* Header - Enhanced Responsive */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-3 sm:px-4 md:px-6 py-3 sm:py-4 rounded-t-lg sm:rounded-t-xl">
               <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900">📱 QR Scanner</h3>
-                  <p className="text-xs sm:text-sm text-gray-500 mt-1">Scan tickets for verification</p>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-900 truncate">📱 QR Scanner</h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">Scan tickets for verification</p>
                 </div>
                 <button
                   onClick={closeScanner}
-                  className="text-gray-400 hover:text-gray-600 p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
+                  className="text-gray-400 hover:text-gray-600 active:text-gray-800 p-1.5 sm:p-2 hover:bg-gray-100 active:bg-gray-200 rounded-full transition-colors flex-shrink-0 ml-2"
                   title="Close Scanner"
                 >
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

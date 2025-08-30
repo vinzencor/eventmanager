@@ -93,7 +93,7 @@ function App() {
             <Route
               path="/admin/dashboard"
               element={
-                <ProtectedRoute allowedRoles={['temp_admin']}>
+                <ProtectedRoute allowedRoles={['super_admin', 'temp_admin']}>
                   <AdminDashboard />
                 </ProtectedRoute>
               }
@@ -102,7 +102,7 @@ function App() {
             <Route
               path="/admin/events/create"
               element={
-                <ProtectedRoute allowedRoles={['temp_admin']}>
+                <ProtectedRoute allowedRoles={['super_admin', 'temp_admin']}>
                   <CreateEvent />
                 </ProtectedRoute>
               }

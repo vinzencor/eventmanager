@@ -4,6 +4,7 @@ import { doc, getDoc, collection, query, where, getDocs, updateDoc } from 'fireb
 import { db } from '../../firebase/config';
 import { verifyTicketQR, sendCheckInConfirmationEmail } from '../../services/emailService';
 import { useAuth } from '../../contexts/AuthContext';
+import jsQR from 'jsqr';
 
 const QRScanner = () => {
   const { eventId } = useParams();
@@ -62,6 +63,43 @@ const QRScanner = () => {
     }
     setScanning(false);
   };
+
+  // QR Code scanning logic
+  const scanQRCode = () => {
+    if (videoRef.current && canvasRef.current && scanning) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d');
+
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+        if (code) {
+          console.log('QR Code detected:', code.data);
+          stopCamera();
+          verifyTicket(code.data);
+        }
+      }
+    }
+  };
+
+  // Start scanning loop when camera starts
+  useEffect(() => {
+    let scanInterval;
+    if (scanning && videoRef.current) {
+      scanInterval = setInterval(scanQRCode, 100); // Scan every 100ms
+    }
+    return () => {
+      if (scanInterval) {
+        clearInterval(scanInterval);
+      }
+    };
+  }, [scanning]);
 
   const verifyTicket = async (qrData) => {
     try {

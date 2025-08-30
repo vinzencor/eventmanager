@@ -5,18 +5,29 @@
   .xs\:h-40 {
     height: 10rem;
   }
-  
+
   .xs\:w-10 {
     width: 2.5rem;
   }
-  
+
   .xs\:h-10 {
     height: 2.5rem;
   }
-  
+
   .xs\:text-xs {
     font-size: 0.75rem;
     line-height: 1rem;
+  }
+
+  .xs\:hidden {
+    display: none;
+  }
+}
+
+/* Show on extra small screens and up */
+@media (min-width: 476px) {
+  .xs\:inline {
+    display: inline;
   }
 }
 

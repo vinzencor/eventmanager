@@ -6,18 +6,12 @@ import { deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 
 const AdminDashboard = () => {
-  const { currentUser, logout, userRole } = useAuth();
+  const { currentUser, userRole } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState('upcoming');
   const { events, loading } = useRealTimeEvents(currentUser?.uid, userRole);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error('Failed to log out:', error);
-    }
-  };
+
 
   // Event Management Functions
   const handleCreateEvent = () => {
@@ -90,22 +84,22 @@ const AdminDashboard = () => {
       {/* Header */}
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-6 space-y-4 sm:space-y-0">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 truncate">
+                Admin Dashboard
+              </h1>
+            </div>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
               <Link
                 to="/admin/events/create"
-                className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                className="w-full sm:w-auto bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md text-sm font-medium text-center"
               >
                 Create Event
               </Link>
-              <span className="text-gray-700">Welcome, {currentUser.email}</span>
-              <button
-                onClick={handleLogout}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-              >
-                Logout
-              </button>
+              <span className="hidden lg:block text-sm text-gray-700 truncate max-w-48">
+                Welcome, {currentUser.email}
+              </span>
             </div>
           </div>
         </div>
@@ -195,7 +189,7 @@ const AdminDashboard = () => {
 
         {/* Navigation Tabs */}
         <div className="border-b border-gray-200 mb-6">
-          <nav className="-mb-px flex space-x-8">
+          <nav className="-mb-px flex space-x-4 sm:space-x-8 overflow-x-auto">
             {[
               { id: 'all', name: 'All Events', count: events.length },
               { id: 'upcoming', name: 'Upcoming', count: events.filter(e => new Date(e.date) >= new Date()).length },
@@ -209,7 +203,7 @@ const AdminDashboard = () => {
                   activeTab === tab.id
                     ? 'border-primary-500 text-primary-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                } whitespace-nowrap py-4 px-2 sm:px-4 border-b-2 font-medium text-sm flex-shrink-0`}
               >
                 {tab.name} ({tab.count})
               </button>
@@ -224,24 +218,24 @@ const AdminDashboard = () => {
               const eventStatus = getEventStatus(event);
               return (
                 <li key={event.id} className="px-4 py-4 sm:px-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-16 w-16">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+                    <div className="flex items-center min-w-0 flex-1">
+                      <div className="flex-shrink-0 h-12 w-12 sm:h-16 sm:w-16">
                         {event.imageUrl ? (
-                          <img className="h-16 w-16 rounded-lg object-cover" src={event.imageUrl} alt="" />
+                          <img className="h-12 w-12 sm:h-16 sm:w-16 rounded-lg object-cover" src={event.imageUrl} alt="" />
                         ) : (
-                          <div className="h-16 w-16 rounded-lg bg-gray-300 flex items-center justify-center">
-                            <span className="text-gray-600 font-medium text-lg">{event.title.charAt(0)}</span>
+                          <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-lg bg-gray-300 flex items-center justify-center">
+                            <span className="text-gray-600 font-medium text-sm sm:text-lg">{event.title.charAt(0)}</span>
                           </div>
                         )}
                       </div>
-                      <div className="ml-4">
-                        <div className="text-lg font-medium text-gray-900">{event.title}</div>
+                      <div className="ml-4 min-w-0 flex-1">
+                        <div className="text-base sm:text-lg font-medium text-gray-900 truncate">{event.title}</div>
                         <div className="text-sm text-gray-500">
                           {new Date(event.date).toLocaleDateString()} at {event.time}
                         </div>
                         {event.location && (
-                          <div className="text-sm text-gray-500">{event.location}</div>
+                          <div className="text-sm text-gray-500 truncate">{event.location}</div>
                         )}
                         <div className="mt-1">
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${eventStatus.color}`}>
@@ -250,8 +244,8 @@ const AdminDashboard = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-4">
-                      <div className="text-right">
+                    <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                      <div className="text-center sm:text-right">
                         <div className="text-sm font-medium text-gray-900">
                           {event.registrations || 0} / {event.ticketCount}
                         </div>
@@ -260,7 +254,7 @@ const AdminDashboard = () => {
                           {event.availableTickets} available
                         </div>
                       </div>
-                      <div className="flex flex-col space-y-1">
+                      <div className="flex justify-center sm:justify-start">
                         <div className="flex space-x-1">
                           <button
                             onClick={() => handleViewEvent(event.id)}
