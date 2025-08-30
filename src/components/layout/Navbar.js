@@ -14,6 +14,7 @@ const Navbar = () => {
   const [scanResult, setScanResult] = useState(null);
   const [manualInput, setManualInput] = useState('');
   const [selectedEventId, setSelectedEventId] = useState('');
+  const [processing, setProcessing] = useState(false);
   const [availableEvents, setAvailableEvents] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
   const videoRef = useRef(null);
@@ -116,6 +117,7 @@ const Navbar = () => {
 
         if (code) {
           console.log('QR Code detected:', code.data);
+          setProcessing(true);
           stopCamera();
           verifyTicket(code.data);
         }
@@ -169,6 +171,8 @@ const Navbar = () => {
             type: 'NOT_FOUND'
           });
 
+          setProcessing(false);
+
           // Auto-reset after 2 seconds
           setTimeout(() => {
             setScanResult(null);
@@ -189,6 +193,8 @@ const Navbar = () => {
             type: 'ALREADY_VERIFIED',
             ticketData: ticketData
           });
+
+          setProcessing(false);
 
           // Auto-reset after 3 seconds for already verified tickets
           setTimeout(() => {
@@ -239,6 +245,8 @@ const Navbar = () => {
           emailSent: eventData && ticketData.email
         });
 
+        setProcessing(false);
+
         // Auto-reset after 3 seconds for continuous scanning
         setTimeout(() => {
           setScanResult(null);
@@ -253,6 +261,8 @@ const Navbar = () => {
           message: verification.message,
           type: verification.type
         });
+
+        setProcessing(false);
 
         // Auto-reset after 2 seconds for failed scans
         setTimeout(() => {
@@ -270,6 +280,8 @@ const Navbar = () => {
         message: 'Verification failed: ' + error.message,
         type: 'ERROR'
       });
+
+      setProcessing(false);
 
       // Auto-reset after 2 seconds for errors
       setTimeout(() => {
@@ -623,6 +635,24 @@ const Navbar = () => {
                                 {scanResult.ticketData.ticketNumber}
                               </span>
                             </div>
+                            <div className="flex justify-between items-center py-1 border-b border-gray-100">
+                              <span className="text-xs text-gray-600">Status:</span>
+                              <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                                scanResult.ticketData.checkedIn
+                                  ? 'bg-green-100 text-green-800'
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {scanResult.ticketData.checkedIn ? '✅ VERIFIED' : '⏳ NOT VERIFIED'}
+                              </span>
+                            </div>
+                            {scanResult.ticketData.checkedIn && scanResult.ticketData.checkedInAt && (
+                              <div className="flex justify-between items-center py-1 border-b border-gray-100">
+                                <span className="text-xs text-gray-600">Verified At:</span>
+                                <span className="text-xs text-gray-900">
+                                  {new Date(scanResult.ticketData.checkedInAt.toDate()).toLocaleString()}
+                                </span>
+                              </div>
+                            )}
                             {scanResult.ticketData.email && (
                               <div className="flex justify-between items-center py-1 border-b border-gray-100">
                                 <span className="text-xs text-gray-600">Email:</span>
