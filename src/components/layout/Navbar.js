@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { verifyTicketQR, sendCheckInConfirmationEmail } from '../../services/emailService';
 import { collection, query, where, getDocs, updateDoc, orderBy, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase/config';
+import jsQR from 'jsqr';
 
 const Navbar = () => {
   const { currentUser, logout, userRole } = useAuth();
@@ -17,6 +18,7 @@ const Navbar = () => {
   const [loadingEvents, setLoadingEvents] = useState(false);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
+  const canvasRef = useRef(null);
 
   const handleLogout = async () => {
     try {
@@ -97,6 +99,43 @@ const Navbar = () => {
     setScanning(false);
   };
 
+  // QR Code scanning logic
+  const scanQRCode = () => {
+    if (videoRef.current && canvasRef.current && scanning) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d');
+
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+        if (code) {
+          console.log('QR Code detected:', code.data);
+          stopCamera();
+          verifyTicket(code.data);
+        }
+      }
+    }
+  };
+
+  // Start scanning loop when camera starts
+  useEffect(() => {
+    let scanInterval;
+    if (scanning && videoRef.current) {
+      scanInterval = setInterval(scanQRCode, 100); // Scan every 100ms
+    }
+    return () => {
+      if (scanInterval) {
+        clearInterval(scanInterval);
+      }
+    };
+  }, [scanning]);
+
   const verifyTicket = async (qrData) => {
     if (!selectedEventId) {
       setScanResult({
@@ -129,6 +168,14 @@ const Navbar = () => {
             message: 'Ticket not found in database',
             type: 'NOT_FOUND'
           });
+
+          // Auto-reset after 2 seconds
+          setTimeout(() => {
+            setScanResult(null);
+            if (selectedEventId) {
+              startCamera();
+            }
+          }, 2000);
           return;
         }
         
@@ -142,6 +189,14 @@ const Navbar = () => {
             type: 'ALREADY_USED',
             ticketData: ticketData
           });
+
+          // Auto-reset after 3 seconds for already used tickets
+          setTimeout(() => {
+            setScanResult(null);
+            if (selectedEventId) {
+              startCamera();
+            }
+          }, 3000);
           return;
         }
         
@@ -183,6 +238,14 @@ const Navbar = () => {
           ticketData: ticketData,
           emailSent: eventData && ticketData.email
         });
+
+        // Auto-reset after 3 seconds for continuous scanning
+        setTimeout(() => {
+          setScanResult(null);
+          if (selectedEventId) {
+            startCamera();
+          }
+        }, 3000);
         
       } else {
         setScanResult({
@@ -190,6 +253,14 @@ const Navbar = () => {
           message: verification.message,
           type: verification.type
         });
+
+        // Auto-reset after 2 seconds for failed scans
+        setTimeout(() => {
+          setScanResult(null);
+          if (selectedEventId) {
+            startCamera();
+          }
+        }, 2000);
       }
       
     } catch (error) {
@@ -199,6 +270,14 @@ const Navbar = () => {
         message: 'Verification failed: ' + error.message,
         type: 'ERROR'
       });
+
+      // Auto-reset after 2 seconds for errors
+      setTimeout(() => {
+        setScanResult(null);
+        if (selectedEventId) {
+          startCamera();
+        }
+      }, 2000);
     }
   };
 
@@ -411,6 +490,8 @@ const Navbar = () => {
                         autoPlay
                         playsInline
                       />
+                      {/* Hidden canvas for QR code processing */}
+                      <canvas ref={canvasRef} style={{ display: 'none' }} />
                       {/* Enhanced scanning overlay */}
                       <div className="absolute inset-0 rounded-xl pointer-events-none">
                         {/* Corner brackets */}
@@ -460,7 +541,7 @@ const Navbar = () => {
                       onChange={(e) => setManualInput(e.target.value)}
                       placeholder="Paste QR code data here..."
                       className="w-full sm:flex-1 px-3 py-2.5 sm:py-3 text-xs sm:text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                      onKeyPress={(e) => {
+                      onKeyDown={(e) => {
                         if (e.key === 'Enter' && manualInput.trim() && selectedEventId) {
                           handleManualVerification();
                         }
