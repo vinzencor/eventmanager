@@ -185,12 +185,12 @@ const Navbar = () => {
         if (ticketData.checkedIn) {
           setScanResult({
             success: false,
-            message: `Already used at ${new Date(ticketData.checkedInAt.toDate()).toLocaleString()}`,
-            type: 'ALREADY_USED',
+            message: `✅ Already Verified - Checked in at ${new Date(ticketData.checkedInAt.toDate()).toLocaleString()}`,
+            type: 'ALREADY_VERIFIED',
             ticketData: ticketData
           });
 
-          // Auto-reset after 3 seconds for already used tickets
+          // Auto-reset after 3 seconds for already verified tickets
           setTimeout(() => {
             setScanResult(null);
             if (selectedEventId) {
@@ -233,7 +233,7 @@ const Navbar = () => {
 
         setScanResult({
           success: true,
-          message: '✅ Valid ticket - Entry approved! Confirmation email sent.',
+          message: '✅ Ticket Verified Successfully! Entry approved.',
           type: 'APPROVED',
           ticketData: ticketData,
           emailSent: eventData && ticketData.email

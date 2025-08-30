@@ -338,6 +338,7 @@ export const sendCheckInConfirmationEmail = async (ticketData, eventData, adminE
       return { success: false, error: 'EmailJS not configured' };
     }
 
+    // Create check-in specific email parameters
     const emailParams = {
       to_email: ticketData.email,
       to_name: ticketData.name,
@@ -348,15 +349,25 @@ export const sendCheckInConfirmationEmail = async (ticketData, eventData, adminE
       ticket_number: ticketData.ticketNumber,
       check_in_time: new Date().toLocaleString(),
       admin_email: adminEmail,
-      confirmation_message: '✅ Your ticket has been successfully verified and you are checked in!'
+      // Use a simple verification message instead of full ticket details
+      message: `✅ Your ticket has been verified successfully!
+
+Event: ${eventData.title}
+Date: ${new Date(eventData.date).toLocaleDateString()}
+Time: ${eventData.time}
+Ticket: #${ticketData.ticketNumber}
+Verified at: ${new Date().toLocaleString()}
+
+Welcome to the event! 🎉`,
+      subject: `✅ Ticket Verified - ${eventData.title}`
     };
 
     console.log('📧 Sending check-in confirmation...');
 
-    // Use the same template but with different content
+    // Use the same template but with verification-specific content
     const result = await emailjs.send(
       EMAIL_CONFIG.serviceId,
-      EMAIL_CONFIG.templateId, // Use existing template
+      EMAIL_CONFIG.templateId,
       emailParams
     );
 
