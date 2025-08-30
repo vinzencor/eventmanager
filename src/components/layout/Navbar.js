@@ -504,6 +504,16 @@ const Navbar = () => {
                       />
                       {/* Hidden canvas for QR code processing */}
                       <canvas ref={canvasRef} style={{ display: 'none' }} />
+
+                      {/* Processing Indicator */}
+                      {processing && (
+                        <div className="absolute inset-0 bg-black bg-opacity-50 rounded-xl flex items-center justify-center">
+                          <div className="bg-white rounded-lg p-4 text-center">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2"></div>
+                            <p className="text-sm font-medium text-gray-700">Processing QR Code...</p>
+                          </div>
+                        </div>
+                      )}
                       {/* Enhanced scanning overlay */}
                       <div className="absolute inset-0 rounded-xl pointer-events-none">
                         {/* Corner brackets */}
@@ -578,13 +588,13 @@ const Navbar = () => {
                 </div>
               </div>
 
-              {/* Fully Responsive Scan Result */}
+              {/* Enhanced Modal-Style Scan Result */}
               {scanResult && (
-                <div className={`rounded-xl border-2 transition-all duration-500 transform ${
+                <div className={`rounded-xl border-4 transition-all duration-500 transform scale-105 ${
                   scanResult.success
-                    ? 'bg-gradient-to-br from-green-50 to-green-100 border-green-300 shadow-green-200'
-                    : 'bg-gradient-to-br from-red-50 to-red-100 border-red-300 shadow-red-200'
-                } shadow-lg hover:shadow-xl`}>
+                    ? 'bg-gradient-to-br from-green-50 to-green-100 border-green-500 shadow-green-400'
+                    : 'bg-gradient-to-br from-red-50 to-red-100 border-red-500 shadow-red-400'
+                } shadow-2xl animate-bounce`}>
                   {/* Result Header */}
                   <div className={`px-3 sm:px-4 py-3 rounded-t-xl ${
                     scanResult.success ? 'bg-green-500' : 'bg-red-500'
@@ -594,8 +604,11 @@ const Navbar = () => {
                         {scanResult.success ? '✅' : '❌'}
                       </div>
                       <div className="flex-1">
-                        <p className="text-white font-semibold text-xs sm:text-sm">
-                          {scanResult.success ? 'TICKET APPROVED' : 'TICKET REJECTED'}
+                        <p className="text-white font-bold text-sm sm:text-lg">
+                          {scanResult.success
+                            ? (scanResult.type === 'ALREADY_VERIFIED' ? '✅ ALREADY VERIFIED' : '✅ VERIFIED')
+                            : '❌ REJECTED'
+                          }
                         </p>
                         <p className="text-white text-xs opacity-90">
                           {new Date().toLocaleString()}
@@ -604,13 +617,33 @@ const Navbar = () => {
                     </div>
                   </div>
 
-                  {/* Result Content */}
-                  <div className="p-3 sm:p-4 space-y-3">
-                    <p className={`font-medium text-xs sm:text-sm ${
+                  {/* Large Status Display */}
+                  <div className="text-center py-4">
+                    <div className={`text-6xl mb-2 ${
+                      scanResult.success ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {scanResult.success
+                        ? (scanResult.type === 'ALREADY_VERIFIED' ? '✅' : '✅')
+                        : '❌'
+                      }
+                    </div>
+                    <div className={`text-xl sm:text-2xl font-bold mb-2 ${
                       scanResult.success ? 'text-green-800' : 'text-red-800'
+                    }`}>
+                      {scanResult.success
+                        ? (scanResult.type === 'ALREADY_VERIFIED' ? 'ALREADY VERIFIED' : 'VERIFIED')
+                        : 'REJECTED'
+                      }
+                    </div>
+                    <p className={`font-medium text-xs sm:text-sm ${
+                      scanResult.success ? 'text-green-700' : 'text-red-700'
                     }`}>
                       {scanResult.message}
                     </p>
+                  </div>
+
+                  {/* Result Content */}
+                  <div className="p-3 sm:p-4 space-y-3">
 
                     {scanResult.ticketData && (
                       <div className="space-y-3">
