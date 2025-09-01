@@ -4,6 +4,15 @@ import { doc, collection, addDoc, updateDoc, increment, getDocs, query, where } 
 import { db } from '../../firebase/config';
 import { generateTicketNumber, generateVerificationQRData, sendTicketEmail } from '../../services/emailService';
 
+// Helper function to format date as dd/mm/yy
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear().toString().slice(-2);
+  return `${day}/${month}/${year}`;
+};
+
 const EventRegistration = () => {
   const { qrCode } = useParams();
   const [event, setEvent] = useState(null);
@@ -135,7 +144,7 @@ const EventRegistration = () => {
         userEmail: formData.email,
         userName: formData.name,
         eventTitle: event.title,
-        eventDate: new Date(event.date).toLocaleDateString(),
+        eventDate: formatDate(event.date),
         eventTime: event.time,
         eventLocation: event.location,
         ticketNumber: ticketNumber,
@@ -207,19 +216,18 @@ const EventRegistration = () => {
       </div>
     );
   }
-
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
         <div className="text-center max-w-md">
-          <div className="text-6xl mb-4">�</div>
+          <div className="text-6xl mb-4">🎉</div>
           <h2 className="text-2xl font-heading text-green-600 mb-4">You're In! 🚀</h2>
           <p className="text-gray-600 mb-4">
             Awesome! You've secured your spot for <strong>{event.title}</strong>!
           </p>
           <div className="bg-white rounded-lg p-4 shadow-md text-left">
             <h3 className="font-semibold text-gray-900 mb-2">Event Details:</h3>
-            <p className="text-sm text-gray-600">📅 {new Date(event.date).toLocaleDateString()}</p>
+            <p className="text-sm text-gray-600">📅 {formatDate(event.date)}</p>
             <p className="text-sm text-gray-600">🕐 {event.time}</p>
             {event.location && <p className="text-sm text-gray-600">📍 {event.location}</p>}
             {formData.timeSlot && <p className="text-sm text-gray-600">⏰ {formData.timeSlot}</p>}
@@ -244,7 +252,7 @@ const EventRegistration = () => {
           </p>
           <div className="bg-white rounded-lg p-4 shadow-md">
             <h3 className="font-semibold text-gray-900 mb-2">Event Details:</h3>
-            <p className="text-sm text-gray-600">📅 {new Date(event.date).toLocaleDateString()}</p>
+            <p className="text-sm text-gray-600">📅 {formatDate(event.date)}</p>
             <p className="text-sm text-gray-600">🕐 {event.time}</p>
             {event.location && <p className="text-sm text-gray-600">📍 {event.location}</p>}
           </div>
@@ -270,7 +278,7 @@ const EventRegistration = () => {
           <div className="p-4">
             <h1 className="text-xl font-heading text-gray-900 mb-2">{event.title}</h1>
             <div className="space-y-1 text-sm font-body text-gray-600">
-              <p>📅 {new Date(event.date).toLocaleDateString()}</p>
+              <p>📅 {formatDate(event.date)}</p>
               <p>🕐 {event.time}</p>
               {event.location && <p>📍 {event.location}</p>}
               <p className="text-primary-600 font-medium">
