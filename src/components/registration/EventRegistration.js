@@ -259,11 +259,13 @@ const EventRegistration = () => {
         {/* Event Header */}
         <div className="bg-white rounded-lg shadow-md mb-6 overflow-hidden">
           {event.imageUrl && (
-            <img
-              src={event.imageUrl}
-              alt={event.title}
-              className="w-full h-32 object-cover"
-            />
+            <div className="w-full">
+              <img
+                src={event.imageUrl}
+                alt={event.title}
+                className="w-full h-auto object-contain max-h-64"
+              />
+            </div>
           )}
           <div className="p-4">
             <h1 className="text-xl font-bold text-gray-900 mb-2">{event.title}</h1>
