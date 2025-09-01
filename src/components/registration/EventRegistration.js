@@ -212,10 +212,10 @@ const EventRegistration = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
         <div className="text-center max-w-md">
-          <div className="text-6xl mb-4">🎉</div>
-          <h2 className="text-2xl font-bold text-green-600 mb-4">Registration Successful!</h2>
+          <div className="text-6xl mb-4">�</div>
+          <h2 className="text-2xl font-heading text-green-600 mb-4">You're In! 🚀</h2>
           <p className="text-gray-600 mb-4">
-            Thank you for registering for <strong>{event.title}</strong>!
+            Awesome! You've secured your spot for <strong>{event.title}</strong>!
           </p>
           <div className="bg-white rounded-lg p-4 shadow-md text-left">
             <h3 className="font-semibold text-gray-900 mb-2">Event Details:</h3>
@@ -225,7 +225,7 @@ const EventRegistration = () => {
             {formData.timeSlot && <p className="text-sm text-gray-600">⏰ {formData.timeSlot}</p>}
           </div>
           <p className="text-xs text-gray-500 mt-4">
-            Please save this confirmation for your records.
+            🎫 Your digital ticket is on its way! Check your email for the magic ✨
           </p>
         </div>
       </div>
@@ -268,8 +268,8 @@ const EventRegistration = () => {
             </div>
           )}
           <div className="p-4">
-            <h1 className="text-xl font-bold text-gray-900 mb-2">{event.title}</h1>
-            <div className="space-y-1 text-sm text-gray-600">
+            <h1 className="text-xl font-heading text-gray-900 mb-2">{event.title}</h1>
+            <div className="space-y-1 text-sm font-body text-gray-600">
               <p>📅 {new Date(event.date).toLocaleDateString()}</p>
               <p>🕐 {event.time}</p>
               {event.location && <p>📍 {event.location}</p>}
@@ -282,7 +282,8 @@ const EventRegistration = () => {
 
         {/* Registration Form */}
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Register for Event</h2>
+          <h2 className="text-xl font-heading text-gray-900 mb-2">🎉 Secure Your Spot!</h2>
+          <p className="text-gray-600 text-sm font-body mb-6">Join the excitement - your adventure awaits!</p>
           
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
@@ -290,10 +291,10 @@ const EventRegistration = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name *
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="relative">
+              <label htmlFor="name" className="block text-sm font-display text-gray-800 mb-2">
+                👤 What should we call you? *
               </label>
               <input
                 type="text"
@@ -302,14 +303,14 @@ const EventRegistration = () => {
                 required
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                placeholder="Enter your full name"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:bg-white transition-all duration-200 placeholder-gray-400"
+                placeholder="Your awesome name here..."
               />
             </div>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address *
+            <div className="relative">
+              <label htmlFor="email" className="block text-sm font-display text-gray-800 mb-2">
+                📧 Where can we reach you? *
               </label>
               <input
                 type="email"
@@ -318,14 +319,14 @@ const EventRegistration = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                placeholder="Enter your email"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:bg-white transition-all duration-200 placeholder-gray-400"
+                placeholder="your.email@awesome.com"
               />
             </div>
 
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number *
+            <div className="relative">
+              <label htmlFor="phone" className="block text-sm font-semibold text-gray-800 mb-2">
+                📱 Your hotline number *
               </label>
               <input
                 type="tel"
@@ -334,15 +335,15 @@ const EventRegistration = () => {
                 required
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                placeholder="Enter your phone number"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:bg-white transition-all duration-200 placeholder-gray-400"
+                placeholder="+1 (555) 123-4567"
               />
             </div>
 
             {event.timeSlots && event.timeSlots.length > 0 && (
-              <div>
-                <label htmlFor="timeSlot" className="block text-sm font-medium text-gray-700 mb-1">
-                  Select Time Slot *
+              <div className="relative">
+                <label htmlFor="timeSlot" className="block text-sm font-display text-gray-800 mb-2">
+                  ⏰ Pick your perfect time *
                 </label>
                 <select
                   id="timeSlot"
@@ -350,30 +351,44 @@ const EventRegistration = () => {
                   required
                   value={formData.timeSlot}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:bg-white transition-all duration-200 appearance-none cursor-pointer"
                 >
-                  <option value="">Choose a time slot</option>
+                  <option value="">When works best for you?</option>
                   {event.timeSlots.map((slot, index) => (
                     <option key={index} value={slot}>
                       {slot}
                     </option>
                   ))}
                 </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none mt-8">
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
             )}
 
             <button
               type="submit"
               disabled={submitting}
-              className="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-button py-4 px-6 rounded-xl shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-primary-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] transition-all duration-200"
             >
-              {submitting ? 'Registering...' : 'Register Now'}
+              {submitting ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  ✨ Securing your spot...
+                </div>
+              ) : (
+                <div className="flex items-center justify-center">
+                  🚀 Let's Go! Register Now
+                </div>
+              )}
             </button>
           </form>
         </div>
 
         <p className="text-center text-xs text-gray-500 mt-4">
-          By registering, you agree to receive event-related communications.
+          🎉 By joining, you'll get exclusive event updates & surprises!
         </p>
       </div>
     </div>
