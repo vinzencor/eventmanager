@@ -7,7 +7,6 @@ import { useAuth } from '../../contexts/AuthContext';
 const EditEvent = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
-  const { userRole } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -27,6 +26,7 @@ const EditEvent = () => {
 
   useEffect(() => {
     fetchEvent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId]);
 
   const fetchEvent = async () => {

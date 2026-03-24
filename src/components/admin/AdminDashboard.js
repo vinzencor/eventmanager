@@ -14,9 +14,6 @@ const AdminDashboard = () => {
 
 
   // Event Management Functions
-  const handleCreateEvent = () => {
-    navigate('/admin/events/create');
-  };
 
   const handleViewEvent = (eventId) => {
     navigate(`/admin/events/${eventId}`);

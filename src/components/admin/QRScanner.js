@@ -22,6 +22,7 @@ const QRScanner = () => {
 
   useEffect(() => {
     fetchEvent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId]);
 
   const fetchEvent = async () => {
@@ -99,6 +100,7 @@ const QRScanner = () => {
         clearInterval(scanInterval);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scanning]);
 
   const verifyTicket = async (qrData) => {

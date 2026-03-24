@@ -137,6 +137,7 @@ const Navbar = () => {
         clearInterval(scanInterval);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scanning]);
 
   const verifyTicket = async (qrData) => {
