@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase/config';
-import { useAuth } from '../../contexts/AuthContext';
 
 const EditEvent = () => {
   const { eventId } = useParams();
