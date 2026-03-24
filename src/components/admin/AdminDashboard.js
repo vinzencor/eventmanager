@@ -82,7 +82,7 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow">
+      <header className="glass sticky top-[64px] z-30 border-b border-gray-100 animate-slide-down shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-6 space-y-4 sm:space-y-0">
             <div className="min-w-0 flex-1">
@@ -107,30 +107,30 @@ const AdminDashboard = () => {
 
       {/* Stats */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white overflow-hidden shadow rounded-lg">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6 mb-8">
+          <div className="bg-white overflow-hidden shadow-sm hover:shadow-lg rounded-xl transition-all duration-300 hover:-translate-y-1 animate-fade-in-up border border-gray-100 group">
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-primary-500 rounded-md flex items-center justify-center">
+                  <div className="w-10 h-10 bg-gradient-to-br from-primary-400 to-primary-600 rounded-lg flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
                     <span className="text-white font-bold">{events.length}</span>
                   </div>
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">Total Events</dt>
-                    <dd className="text-lg font-medium text-gray-900">Created by you</dd>
+                    <dd className="text-lg font-bold text-gray-900">Created by you</dd>
                   </dl>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="bg-white overflow-hidden shadow-sm hover:shadow-lg rounded-xl transition-all duration-300 hover:-translate-y-1 animate-fade-in-up delay-100 border border-gray-100 group">
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                  <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
                     <span className="text-white font-bold">
                       {events.filter(e => new Date(e.date) >= new Date()).length}
                     </span>
@@ -139,18 +139,18 @@ const AdminDashboard = () => {
                 <div className="ml-5 w-0 flex-1">
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">Upcoming Events</dt>
-                    <dd className="text-lg font-medium text-gray-900">Active</dd>
+                    <dd className="text-lg font-bold text-gray-900">Active</dd>
                   </dl>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="bg-white overflow-hidden shadow-sm hover:shadow-lg rounded-xl transition-all duration-300 hover:-translate-y-1 animate-fade-in-up delay-200 border border-gray-100 group">
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                  <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-lg flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
                     <span className="text-white font-bold">
                       {events.reduce((sum, event) => sum + (event.registrations || 0), 0)}
                     </span>
@@ -158,19 +158,19 @@ const AdminDashboard = () => {
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">Total Registrations</dt>
-                    <dd className="text-lg font-medium text-gray-900">All events</dd>
+                    <dt className="text-sm font-medium text-gray-500 truncate">Registrations</dt>
+                    <dd className="text-lg font-bold text-gray-900">All events</dd>
                   </dl>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="bg-white overflow-hidden shadow-sm hover:shadow-lg rounded-xl transition-all duration-300 hover:-translate-y-1 animate-fade-in-up delay-300 border border-gray-100 group">
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-red-500 rounded-md flex items-center justify-center">
+                  <div className="w-10 h-10 bg-gradient-to-br from-red-400 to-red-600 rounded-lg flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
                     <span className="text-white font-bold">
                       {events.filter(e => e.availableTickets === 0).length}
                     </span>
@@ -179,7 +179,7 @@ const AdminDashboard = () => {
                 <div className="ml-5 w-0 flex-1">
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">Sold Out</dt>
-                    <dd className="text-lg font-medium text-gray-900">Events</dd>
+                    <dd className="text-lg font-bold text-gray-900">Events</dd>
                   </dl>
                 </div>
               </div>
@@ -212,12 +212,12 @@ const AdminDashboard = () => {
         </div>
 
         {/* Events List */}
-        <div className="bg-white shadow overflow-hidden sm:rounded-md">
-          <ul className="divide-y divide-gray-200">
+        <div className="bg-transparent overflow-hidden sm:rounded-md mt-4">
+          <ul className="space-y-4">
             {filteredEvents.map((event) => {
               const eventStatus = getEventStatus(event);
               return (
-                <li key={event.id} className="px-4 py-4 sm:px-6">
+                <li key={event.id} className="bg-white shadow-sm hover:shadow-md border border-gray-100 rounded-xl px-4 py-4 sm:px-6 transition-all duration-300 hover:-translate-y-1 animate-fade-in-up">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
                     <div className="flex items-center min-w-0 flex-1">
                       <div className="flex-shrink-0 h-12 w-12 sm:h-16 sm:w-16">

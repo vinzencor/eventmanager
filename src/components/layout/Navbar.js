@@ -17,6 +17,7 @@ const Navbar = () => {
   const [processing, setProcessing] = useState(false);
   const [availableEvents, setAvailableEvents] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const canvasRef = useRef(null);
@@ -327,57 +328,127 @@ const Navbar = () => {
   return (
     <>
       {/* Enhanced Responsive Navbar */}
-      <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
-          <div className="flex justify-between items-center h-14 sm:h-16">
+      <nav className="glass sticky top-0 z-40 transition-all duration-300 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
             {/* Logo/Brand - Improved */}
-            <div className="flex items-center min-w-0">
-              <Link to="/dashboard" className="flex-shrink-0 hover:opacity-80 transition-opacity">
-                <h1 className="text-base sm:text-lg lg:text-xl font-bold text-primary-600">
-                  <span className="hidden xs:inline">Event Manager</span>
-                  <span className="xs:hidden">EM</span>
+            <div className="flex items-center">
+              <Link to="/dashboard" className="flex-shrink-0 flex items-center gap-2 group">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-purple-600 text-white flex items-center justify-center font-bold text-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  E
+                </div>
+                <h1 className="text-lg sm:text-xl font-bold text-gray-800 tracking-tight transition-colors group-hover:text-primary-600">
+                  <span className="hidden sm:inline">Event Manager</span>
+                  <span className="sm:hidden">Events</span>
                 </h1>
               </Link>
             </div>
 
-            {/* Right side - Enhanced responsive */}
-            <div className="flex items-center space-x-1 sm:space-x-2 lg:space-x-4">
-              {/* QR Scanner Button - Enhanced */}
+            {/* Desktop Right Side */}
+            <div className="hidden sm:flex items-center space-x-4">
               <button
                 onClick={openScanner}
-                className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium flex items-center space-x-1 transition-all duration-200 hover:scale-105 shadow-sm hover:shadow-md"
+                className="bg-gradient-to-r from-purple-600 to-primary-600 hover:from-purple-700 hover:to-primary-700 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center space-x-2 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
                 title="Quick QR Scanner"
               >
-                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M12 12h.01M12 12v.01M12 21.02V21M4.01 12H4m0 0h.01M4 12v.01" />
                 </svg>
-                <span className="hidden sm:inline">📱 Scan</span>
-                <span className="sm:hidden">📱</span>
+                <span>Scan Tickets</span>
               </button>
 
-              {/* User Menu - Enhanced responsive */}
-              <div className="flex items-center space-x-1 sm:space-x-2 lg:space-x-3">
-                <div className="hidden lg:block">
-                  <span className="text-xs sm:text-sm text-gray-700 truncate max-w-24 lg:max-w-32">
-                    {currentUser.email}
+              <div className="flex items-center space-x-3 border-l border-gray-200 pl-4 ml-2">
+                <div className="flex flex-col items-end">
+                  <span className="text-sm font-medium text-gray-900 leading-tight">
+                    {currentUser.email.split('@')[0]}
+                  </span>
+                  <span className="text-xs text-primary-600 font-semibold uppercase tracking-wider">
+                    {userRole === 'super_admin' ? 'Super' : 'Admin'}
                   </span>
                 </div>
-                <span className="text-xs bg-primary-100 text-primary-800 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-medium">
-                  {userRole === 'super_admin' ? 'Super' : 'Admin'}
-                </span>
                 <button
                   onClick={handleLogout}
-                  className="bg-red-600 hover:bg-red-700 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded text-xs sm:text-sm font-medium transition-colors"
+                  className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
                   title="Logout"
                 >
-                  <span className="sm:inline">Logout</span>
-                  <span className="sm:hidden">⏻</span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
                 </button>
               </div>
+            </div>
+
+            {/* Mobile Hamburger Button */}
+            <div className="sm:hidden flex items-center">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 ml-2 text-gray-600 hover:text-primary-600 focus:outline-none transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {isMobileMenuOpen ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+              </button>
             </div>
           </div>
         </div>
       </nav>
+
+      {/* Mobile Menu Panel */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-gray-600/50 backdrop-blur-sm z-40 sm:hidden animate-fade-in"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+      <div className={`fixed inset-y-0 right-0 w-64 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out sm:hidden ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="h-full flex flex-col p-6 space-y-6">
+          <div className="flex justify-between items-center pb-4 border-b border-gray-100">
+            <span className="font-bold text-gray-800 text-lg">Menu</span>
+            <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 -mr-2 text-gray-400 hover:text-gray-600">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          
+          <div className="flex flex-col space-y-4">
+            <div className="bg-gray-50 rounded-lg p-4 mb-2">
+              <p className="text-sm font-semibold text-gray-900 truncate">{currentUser.email}</p>
+              <p className="text-xs text-primary-600 font-medium uppercase mt-1">{userRole === 'super_admin' ? 'Super Admin' : 'Admin'}</p>
+            </div>
+
+            <button
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                openScanner();
+              }}
+              className="w-full bg-gradient-to-r from-purple-600 to-primary-600 text-white px-4 py-3 rounded-lg text-sm font-semibold flex items-center justify-center space-x-2 shadow-md"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M12 12h.01M12 12v.01M12 21.02V21M4.01 12H4m0 0h.01M4 12v.01" />
+              </svg>
+              <span>Scan Tickets</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                handleLogout();
+              }}
+              className="w-full border border-red-200 text-red-600 hover:bg-red-50 px-4 py-3 rounded-lg text-sm font-semibold flex items-center justify-center space-x-2 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Enhanced Responsive QR Scanner Modal */}
       {showScanner && (
